@@ -286,7 +286,7 @@ function AgentUpdate() {
           <li>Nomeie: <code>LanManagerAgent-X.Y.Z.exe</code> (ex: LanManagerAgent-0.2.0.exe)</li>
           <li>Faça upload usando este painel</li>
           <li>Os agentes clientes verificarão automaticamente a cada boot</li>
-          <li>Se versão > versão local, faz download e atualiza automaticamente</li>
+          <li>Se a versão remota for maior que a local, faz download e atualiza automaticamente</li>
           <li>Você pode distribuir versões anteriores via download manual</li>
         </ol>
       </Card>

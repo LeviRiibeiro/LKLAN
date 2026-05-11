@@ -18,7 +18,7 @@ where git >nul 2>&1 || (
 
 where py >nul 2>&1 || (
   echo ERRO: py launcher nao encontrado.
-  echo Instale Python 3.11+ marcando Add Python to PATH.
+  echo Instale Python 3.x marcando Add Python to PATH.
   pause
   exit /b 1
 )
@@ -55,11 +55,15 @@ goto :prep
 
 :prep
 echo [1/5] Criando ambiente virtual Python...
+set "PYTHON_CMD=py -3"
 if not exist ".venv" (
   py -3.11 -m venv .venv
   if errorlevel 1 (
-    py -m venv .venv
-    if errorlevel 1 goto :fail
+    py -3 -m venv .venv
+    if errorlevel 1 (
+      py -m venv .venv
+      if errorlevel 1 goto :fail
+    )
   )
 )
 

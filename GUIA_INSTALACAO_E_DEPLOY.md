@@ -377,7 +377,7 @@ Se estiver no PowerShell, a ativação do venv muda:
 
 **Solução:**
 ```bash
-pip install starlette==0.38.0 --force-reinstall
+pip install starlette==0.37.2 --force-reinstall
 ```
 
 ---

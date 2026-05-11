@@ -43,7 +43,7 @@ ADMIN_BOOTSTRAP.bat run
 py -3.11 -m venv .venv
 .\.venv\\Scripts\\activate.bat
 python -m pip install --upgrade pip
-python -m pip install starlette==0.38.0
+python -m pip install starlette==0.37.2
 cd server
 python -m pip install -r requirements.txt
 cd ..
@@ -75,7 +75,7 @@ npm run dev
    ```
 3. Se `python` não funcionar, use o caminho completo do executável instalado.
 4. Se estiver no `cmd`, use `.venv\\Scripts\\activate.bat`; no PowerShell, use `.venv\\Scripts\\Activate.ps1`.
-5. Se o comando `py -3.11` não existir, instale Python 3.11 e marque "Add Python to PATH".
+5. Se o comando `py -3.11` não existir, use `py -3` ou `py` e deixe o launcher escolher a versão instalada.
 
 ---
 
@@ -165,7 +165,7 @@ python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
 
 **Problema:** `TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'`
 ```bash
-pip install starlette==0.38.0 --force-reinstall
+pip install starlette==0.37.2 --force-reinstall
 ```
 
 **Problema:** Agente não conecta
