@@ -50,6 +50,32 @@ export default function MachineDetail() {
     }
   };
 
+  const openVncViewer = async () => {
+    if (!machine?.ip_address) return;
+
+    const target = `vnc://${machine.ip_address}:${machine.vnc_port || 5900}`;
+
+    try {
+      window.open(target, "_blank", "noopener,noreferrer");
+    } catch {
+      try {
+        await navigator.clipboard.writeText(`${machine.ip_address}:${machine.vnc_port || 5900}`);
+        alert("Endereço VNC copiado para a área de transferência.");
+      } catch {
+        alert(`Abra manualmente no Viewer: ${machine.ip_address}:${machine.vnc_port || 5900}`);
+      }
+    }
+  };
+
+  const sendRemoteCommand = async (command) => {
+    try {
+      await api.post(`/machines/${id}/command`, { command });
+      alert(`Comando ${command} enviado com sucesso.`);
+    } catch (err) {
+      alert("Falha ao enviar comando: " + (err.message || err));
+    }
+  };
+
   if (loading) return <p>Carregando...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!machine) return <p>Nenhuma máquina encontrada.</p>;
@@ -73,6 +99,67 @@ export default function MachineDetail() {
         <p>
           <strong>Última atividade:</strong> {machine.last_seen || "-"}
         </p>
+        <p>
+          <strong>Porta VNC:</strong> {machine.vnc_port || 5900}
+        </p>
+        <button
+          type="button"
+          onClick={openVncViewer}
+          style={{
+            background: theme.colors.primary,
+            color: "white",
+            border: "none",
+            padding: "8px 12px",
+            borderRadius: 6,
+            cursor: "pointer",
+          }}
+        >
+          Abrir TigerVNC Viewer
+        </button>
+        <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => sendRemoteCommand("lock")}
+            style={{
+              background: theme.colors.accentSoft,
+              color: theme.colors.textStrong,
+              border: `1px solid ${theme.colors.border}`,
+              padding: "8px 12px",
+              borderRadius: 6,
+              cursor: "pointer",
+            }}
+          >
+            Bloquear tela
+          </button>
+          <button
+            type="button"
+            onClick={() => sendRemoteCommand("restart")}
+            style={{
+              background: theme.colors.panel,
+              color: theme.colors.textStrong,
+              border: `1px solid ${theme.colors.border}`,
+              padding: "8px 12px",
+              borderRadius: 6,
+              cursor: "pointer",
+            }}
+          >
+            Reiniciar
+          </button>
+          <button
+            type="button"
+            onClick={() => sendRemoteCommand("shutdown")}
+            style={{
+              background: theme.colors.danger,
+              color: "white",
+              border: "none",
+              padding: "8px 12px",
+              borderRadius: 6,
+              cursor: "pointer",
+            }}
+          >
+            Desligar
+          </button>
+        </div>
       </Card>
 
       <Card>

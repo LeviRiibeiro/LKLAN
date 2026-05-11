@@ -63,6 +63,31 @@
   ✓ config.ini padrão
   ✓ .env.example template
 
+  ✅ ALINHAMENTO COM O PLANEJAMENTO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    ✓ 2.8 — Exclusão no Windows Defender para o agente
+      • client-agent/deploy/deploy_agent.bat
+      • client-agent/dist/DEPLOY_GUIDE.txt
+
+    ✓ 2.9 — Regras de firewall para portas críticas
+      • client-agent/deploy/deploy_agent.bat
+
+    ✓ 2.10 — Seed inicial do banco
+      • server/seed.py
+
+    ✓ 2.11 — Sincronização de horário (NTP)
+      • client-agent/deploy/deploy_agent.bat
+
+    ✓ 2.12 — Hardening contra encerramento via Task Manager
+      • client-agent/deploy/deploy_agent.bat
+
+    ✓ 2.13 — Fluxo “Esqueci minha senha”
+      • client-agent/lock_screen/login_window.py
+      • client-agent/lock_screen/login_ui.py
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✅ TESTES & DOCUMENTAÇÃO

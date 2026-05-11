@@ -1,5 +1,7 @@
+from pathlib import Path
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -43,6 +45,19 @@ class LoginUI(QWidget):
 
         card = QVBoxLayout()
         card.setSpacing(10)
+
+        logo_path = Path(__file__).resolve().parents[2] / "imgs" / "LKLAN.png"
+        if logo_path.exists():
+            logo = QLabel()
+            pixmap = QPixmap(str(logo_path)).scaled(
+                180,
+                180,
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation,
+            )
+            logo.setPixmap(pixmap)
+            logo.setAlignment(Qt.AlignCenter)
+            card.addWidget(logo)
 
         title = QLabel("LAN Manager Escolar")
         title.setFont(QFont("Courier New", 22, QFont.Bold))

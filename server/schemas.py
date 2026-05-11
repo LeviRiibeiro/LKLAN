@@ -6,6 +6,10 @@ from pydantic import BaseModel, ConfigDict
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user_id: int | None = None
+    name: str | None = None
+    role: str | None = None
+    time_balance: int | None = None
 
 
 class LoginRequest(BaseModel):

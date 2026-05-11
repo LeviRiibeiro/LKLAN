@@ -29,6 +29,7 @@ export default function Dashboard() {
   const setMachines = useStore((state) => state.setMachines);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const previewBaseUrl = api.defaults.baseURL || "http://127.0.0.1:8001";
 
   const loadMachines = async () => {
     setLoading(true);
@@ -149,9 +150,31 @@ export default function Dashboard() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
               {machines.map((machine) => {
                 const visual = statusConfig[machine.status] || statusConfig.offline;
+                const screenshotUrl = `${previewBaseUrl}/machines/${machine.id}/screenshot?t=${encodeURIComponent(
+                  machine.last_seen || machine.id,
+                )}`;
 
                 return (
                   <Card key={machine.id} style={{ padding: 18, minWidth: 0 }}>
+                    <div
+                      style={{
+                        borderRadius: 12,
+                        overflow: "hidden",
+                        border: "1px solid rgba(34, 197, 94, 0.14)",
+                        background: "rgba(0, 0, 0, 0.28)",
+                        marginBottom: 14,
+                        minHeight: 120,
+                      }}
+                    >
+                      <img
+                        src={screenshotUrl}
+                        alt={`Preview da máquina ${machine.name}`}
+                        style={{ display: "block", width: "100%", height: 120, objectFit: "cover" }}
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                        }}
+                      />
+                    </div>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
                       <div>
                         <h3 style={{ margin: 0, fontSize: 20 }}>{machine.name}</h3>

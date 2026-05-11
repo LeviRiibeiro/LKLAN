@@ -816,49 +816,49 @@ echo Build concluido! Arquivo em: dist\LanManagerAgent.exe
 ## 16. Roadmap de Desenvolvimento
 
 ### Sprint 1 — MVP Core (Semana 1)
-- [ ] Configurar projeto FastAPI + SQLite + SQLAlchemy
-- [ ] Criar todos os modelos de banco (users, machines, sessions, lab_config)
-- [ ] Endpoints de autenticação (login/logout com JWT)
-- [ ] Criar `seed.py` para provisionar primeiro admin
-- [ ] Agente cliente básico com heartbeat ao servidor via WebSocket
-- [ ] Tela de login fullscreen PyQt5 com logo da escola
-- [ ] Adicionar ação “Esqueci minha senha” na tela de login
-- [ ] Compilar agente como .exe com PyInstaller
-- [ ] Script `deploy_agent.bat` com Defender + Firewall + NTP
+- [x] Configurar projeto FastAPI + SQLite + SQLAlchemy
+- [x] Criar todos os modelos de banco (users, machines, sessions, lab_config)
+- [x] Endpoints de autenticação (login/logout com JWT)
+- [x] Criar `seed.py` para provisionar primeiro admin
+- [x] Agente cliente básico com heartbeat ao servidor via WebSocket
+- [x] Tela de login fullscreen PyQt5 com logo da escola
+- [x] Adicionar ação “Esqueci minha senha” na tela de login
+- [x] Compilar agente como .exe com PyInstaller
+- [x] Script `deploy_agent.bat` com Defender + Firewall + NTP
 
 ### Sprint 2 — Painel Admin (Semana 2)
-- [ ] Setup React + Tailwind + Vite
-- [ ] Dashboard com grid das 14 máquinas em tempo real
-- [ ] Gestão de usuários: CRUD + importação CSV/Excel
-- [ ] Organização por turmas
-- [ ] Controle de saldo de tempo + sistema de suspensão/advertência
-- [ ] Dedução automática de tempo (APScheduler)
-- [ ] Controle de horário letivo (bloquear fora do horário)
+- [x] Setup React + Tailwind + Vite
+- [x] Dashboard com grid das 14 máquinas em tempo real
+- [x] Gestão de usuários: CRUD + importação CSV/Excel
+- [x] Organização por turmas
+- [x] Controle de saldo de tempo + sistema de suspensão/advertência
+- [x] Dedução automática de tempo (APScheduler)
+- [x] Controle de horário letivo (bloquear fora do horário)
 
 ### Sprint 3 — Controle Remoto (Semana 3)
-- [ ] Instalar TigerVNC nas 14 máquinas via `deploy_agent.bat`
-- [ ] Integrar abertura do VNC Viewer pelo painel
-- [ ] Screenshots periódicos via agente → preview no dashboard
-- [ ] Comandos remotos: desligar, reiniciar, bloquear tela
-- [ ] Modo grade: todas as 14 telas em miniatura simultâneas
+- [x] Instalar TigerVNC nas 14 máquinas via `deploy_agent.bat`
+- [x] Integrar abertura do VNC Viewer pelo painel
+- [x] Screenshots periódicos via agente → preview no dashboard
+- [x] Comandos remotos: desligar, reiniciar, bloquear tela
+- [x] Modo grade: todas as 14 telas em miniatura simultâneas
 
 ### Sprint 4 — Bloqueios e Filtros (Semana 4)
-- [ ] Bloqueio de apps por lista (psutil + kill de processo)
-- [ ] Incluir `msedge.exe` e `firefox.exe` no bloqueio global
-- [ ] Criar extensão Chrome Manifest V3
-- [ ] Endpoint `/blocked-sites` na API
+- [x] Bloqueio de apps por lista (psutil + kill de processo)
+- [x] Incluir `msedge.exe` e `firefox.exe` no bloqueio global
+- [x] Criar extensão Chrome Manifest V3
+- [x] Endpoint `/blocked-sites` na API
 - [ ] Deploy da extensão via Group Policy (script GPO)
-- [ ] Aplicar GPO para desabilitar Task Manager em usuários comuns
-- [ ] Página de bloqueio customizada com logo da escola
+- [x] Aplicar GPO para desabilitar Task Manager em usuários comuns
+- [x] Página de bloqueio customizada com logo da escola
 
 ### Sprint 5 — Estabilização e Extras (Semana 5)
-- [ ] Sistema de auto-update do agente
-- [ ] Backup automático agendado do banco SQLite
-- [ ] Notificação ao aluno (5 min antes de acabar o tempo)
+- [x] Sistema de auto-update do agente
+- [x] Backup automático agendado do banco SQLite
+- [x] Notificação ao aluno (5 min antes de acabar o tempo)
 - [ ] Relatórios de uso exportáveis em PDF
-- [ ] Polimento visual do painel admin
+- [x] Polimento visual do painel admin
 - [ ] Testes completos nas 14 máquinas em produção
-- [ ] Documentação de instalação e uso
+- [x] Documentação de instalação e uso
 
 ---
 

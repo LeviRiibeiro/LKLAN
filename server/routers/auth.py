@@ -58,7 +58,13 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db_session
     await db.commit()
 
     token = create_access_token(subject=user.username)
-    return TokenResponse(access_token=token)
+    return TokenResponse(
+        access_token=token,
+        user_id=user.id,
+        name=user.name,
+        role=user.role,
+        time_balance=user.time_balance,
+    )
 
 
 async def get_current_user(

@@ -67,6 +67,9 @@ async def ws_agent(websocket: WebSocket, machine_id: str) -> None:
     try:
         while True:
             payload = await websocket.receive_json()
+            screenshot_b64 = payload.pop("screenshot_jpeg_b64", None)
+            if screenshot_b64:
+                ws_manager.store_screenshot(machine_id, screenshot_b64, payload.get("timestamp"))
             payload["received_at"] = datetime.utcnow().isoformat()
             await websocket.send_json({"type": "ack", "payload": payload})
     except WebSocketDisconnect:

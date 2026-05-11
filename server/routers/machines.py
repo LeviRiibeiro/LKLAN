@@ -1,13 +1,23 @@
 from datetime import datetime
+from base64 import b64decode
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.database import Machine, Session, User, get_db_session
 from server.schemas import MachineHeartbeat, MachineRead, SessionCreate, SessionDetailRead, SessionRead
+from server.services.command_sender import send_command_to_agent
+from server.services.websocket_manager import ws_manager
 
 router = APIRouter(prefix="/machines", tags=["machines"])
+
+
+class RemoteCommandRequest(BaseModel):
+    command: Literal["lock", "restart", "shutdown"]
 
 
 @router.post("/heartbeat", response_model=MachineRead)
@@ -50,6 +60,45 @@ async def get_machine(machine_id: int, db: AsyncSession = Depends(get_db_session
     if not machine:
         raise HTTPException(status_code=404, detail="Maquina nao encontrada")
     return machine
+
+
+@router.get("/{machine_id}/screenshot")
+async def get_machine_screenshot(machine_id: int, db: AsyncSession = Depends(get_db_session)) -> Response:
+    result = await db.execute(select(Machine).where(Machine.id == machine_id))
+    machine = result.scalar_one_or_none()
+    if not machine:
+        raise HTTPException(status_code=404, detail="Maquina nao encontrada")
+
+    screenshot = ws_manager.get_screenshot(machine.name)
+    if not screenshot:
+        raise HTTPException(status_code=404, detail="Screenshot nao disponivel")
+
+    image_bytes = screenshot.get("image")
+    if not isinstance(image_bytes, (bytes, bytearray)):
+        raise HTTPException(status_code=404, detail="Screenshot nao disponivel")
+
+    return Response(content=bytes(image_bytes), media_type="image/jpeg")
+
+
+@router.post("/{machine_id}/command")
+async def send_machine_command(
+    machine_id: int,
+    payload: RemoteCommandRequest,
+    db: AsyncSession = Depends(get_db_session),
+) -> dict:
+    result = await db.execute(select(Machine).where(Machine.id == machine_id))
+    machine = result.scalar_one_or_none()
+    if not machine:
+        raise HTTPException(status_code=404, detail="Maquina nao encontrada")
+
+    command_payload = {"type": "command", "command": payload.command}
+    delivery = await send_command_to_agent(machine.name, command_payload)
+    return {
+        "status": "ok",
+        "machine_id": machine.id,
+        "machine_name": machine.name,
+        "delivery": delivery,
+    }
 
 
 @router.get("/{machine_id}/sessions", response_model=list[SessionDetailRead])
