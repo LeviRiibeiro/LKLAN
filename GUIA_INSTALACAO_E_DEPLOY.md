@@ -35,6 +35,34 @@
 
 ## 💻 Instalação na Máquina Admin
 
+> **Cenário real do laboratório:** máquina crua, sem VSCode, usando apenas CMD ou PowerShell.
+> Os comandos abaixo foram escritos para funcionar sem depender de editor ou IDE.
+
+### Fluxo mais simples
+
+Se o repositório já estiver clonado, rode apenas:
+
+```bash
+ADMIN_BOOTSTRAP.bat prep
+ADMIN_BOOTSTRAP.bat run
+```
+
+Isso faz todo o trabalho da Admin em sequência: cria venv, instala dependências, faz seed, builda o dashboard e depois abre servidor + dashboard.
+
+### Antes de começar
+
+Abra um Prompt de Comando como Administrador e valide as ferramentas:
+
+```bash
+where python
+where node
+where git
+py --version
+node --version
+```
+
+Se algum comando não responder, instale a ferramenta ou use o caminho completo do executável.
+
 ### Passo 1: Clonar Repositório
 
 ```bash
@@ -46,15 +74,16 @@ cd LKLAN
 ### Passo 2: Criar Ambiente Virtual Python
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate.bat
+py -3.11 -m venv .venv
+.\.venv\\Scripts\\activate.bat
+python -m pip install --upgrade pip
 ```
 
 ### Passo 3: Instalar Dependências
 
 ```bash
 cd server
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 cd ..
 ```
 
@@ -76,6 +105,28 @@ cd admin-dashboard
 npm install
 npm run build
 cd ..
+```
+
+### Se estiver sem VSCode e quiser testar em sequência
+
+Use esta ordem no CMD:
+
+```bash
+cd C:\LKLAN
+.\.venv\\Scripts\\activate.bat
+cd server
+python -m pip install -r requirements.txt
+cd ..
+python -c "import sys; sys.path.insert(0, '.'); import asyncio; from server.seed import seed_admin; asyncio.run(seed_admin())"
+python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
+```
+
+Em outro Prompt:
+
+```bash
+cd C:\LKLAN\admin-dashboard
+npm install
+npm run dev
 ```
 
 ### Passo 6: Iniciar Servidor
@@ -310,6 +361,12 @@ netsh advfirewall firewall add rule name="LAN Manager API" ^
 # Na máquina Admin, dentro da pasta LKLAN:
 set PYTHONPATH=%cd%
 python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
+```
+
+Se estiver no PowerShell, a ativação do venv muda:
+
+```powershell
+.\.venv\\Scripts\\Activate.ps1
 ```
 
 ---

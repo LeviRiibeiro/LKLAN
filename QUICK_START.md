@@ -6,7 +6,7 @@ Você tem agora **LAN Manager Escolar v1.0 100% pronto** para testar nas máquin
 
 **Repositório:** https://github.com/LeviRiibeiro/LKLAN.git
 
-**Último Commit:** `fbd0fb7` — Sprint 5 + .gitignore + Documentação Final
+**Último Commit:** `3a2dd97` — QUICK_START para referência no laboratório
 
 ---
 
@@ -24,12 +24,29 @@ cd LKLAN
 
 ## ✅ Verificação Rápida (5 min)
 
+> **Importante:** este passo a passo assume **somente CMD/PowerShell**, sem VSCode.  
+> Se `python` ou `node` não estiverem no PATH, use o executável completo (`C:\...\python.exe`, `C:\...\node.exe`) ou o launcher `py`.
+
+### Fluxo plug-and-play da Admin
+
+Se você já clonou o repositório na máquina Admin, o caminho mais direto é este:
+
+```bash
+ADMIN_BOOTSTRAP.bat prep
+ADMIN_BOOTSTRAP.bat run
+```
+
+`prep` cria o venv, instala dependências, faz o seed e builda o dashboard. `run` abre servidor e dashboard em janelas separadas.
+
 ```bash
 # Terminal 1: Backend
-python -m venv .venv
-.venv\Scripts\activate.bat
-pip install starlette==0.38.0  # ← IMPORTANTE (versão corrigida)
-cd server && pip install -r requirements.txt && cd ..
+py -3.11 -m venv .venv
+.\.venv\\Scripts\\activate.bat
+python -m pip install --upgrade pip
+python -m pip install starlette==0.38.0
+cd server
+python -m pip install -r requirements.txt
+cd ..
 python -c "import sys; sys.path.insert(0, '.'); import asyncio; from server.seed import seed_admin; asyncio.run(seed_admin())"
 python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
 
@@ -43,6 +60,22 @@ npm run dev
 
 **Acesse:** http://192.168.1.1:8000  
 **Login:** admin / admin123
+
+### Se o ambiente estiver cru e os comandos falharem
+
+1. Teste se o Python está disponível:
+   ```bash
+   py --version
+   python --version
+   ```
+2. Teste se o Node está disponível:
+   ```bash
+   node --version
+   npm --version
+   ```
+3. Se `python` não funcionar, use o caminho completo do executável instalado.
+4. Se estiver no `cmd`, use `.venv\\Scripts\\activate.bat`; no PowerShell, use `.venv\\Scripts\\Activate.ps1`.
+5. Se o comando `py -3.11` não existir, instale Python 3.11 e marque "Add Python to PATH".
 
 ---
 
@@ -114,6 +147,15 @@ python build.bat
 
 ## 🐛 Se Algo Não Funcionar
 
+**Problema:** `python` / `node` não são reconhecidos no terminal
+```bash
+where python
+where node
+py --version
+node --version
+```
+Se não houver retorno, reinstale Python/Node com a opção de adicionar ao PATH marcada.
+
 **Problema:** `ModuleNotFoundError: No module named 'server'`
 ```bash
 cd C:\LKLAN
@@ -137,11 +179,12 @@ netsh advfirewall firewall add rule name="LAN Manager" dir=in action=allow proto
 ## 📞 Próximos Passos
 
 1. Clone o repositório
-2. Siga `GUIA_INSTALACAO_E_DEPLOY.md` para setup completo
-3. Teste na máquina Admin primeiro (10 min)
-4. Deploy agente em 1 máquina client (5 min)
-5. Teste fluxo: login → dedução → bloqueio
-6. Se tudo OK → deploy nas 14 máquinas
+2. Execute `ADMIN_BOOTSTRAP.bat prep`
+3. Execute `ADMIN_BOOTSTRAP.bat run`
+4. Teste na máquina Admin primeiro, em CMD puro, sem VSCode
+5. Deploy agente em 1 máquina client (5 min)
+6. Teste fluxo: login → dedução → bloqueio
+7. Se tudo OK → deploy nas 14 máquinas
 
 ---
 
@@ -154,6 +197,6 @@ Se precisar de ajuda durante o teste, verifique:
 
 ---
 
-**Commit:** `fbd0fb7`  
+**Commit:** `3a2dd97`  
 **Data:** 11 de maio de 2026  
 **Status:** ✅ PRONTO PARA PRODUÇÃO
