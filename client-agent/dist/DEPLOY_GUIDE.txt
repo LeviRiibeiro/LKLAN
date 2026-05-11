@@ -1,0 +1,174 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║   LAN MANAGER ESCOLAR - GUIA DE DEPLOYMENT DO AGENTE v0.1.0               ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+📋 SUMÁRIO
+══════════════════════════════════════════════════════════════════════════════
+1. Preparação
+2. Instalação em máquinas clientes
+3. Configuração do serviço Windows
+4. Verificação
+5. Atualização remota
+6. Troubleshooting
+
+═ 1. PREPARAÇÃO ════════════════════════════════════════════════════════════════
+
+1.1 Criar pasta compartilhada na máquina Admin
+    
+    Na máquina Admin (192.168.1.1):
+    - Criar pasta: C:\LanManager\dist\
+    - Copiar LanManagerAgent.exe para essa pasta
+    - Compartilhar pasta na rede: \\192.168.1.1\LanManager\dist
+
+1.2 Copiar config.ini para dist/
+    
+    Na máquina Admin:
+    - Copiar arquivo config.ini para C:\LanManager\dist\
+    - Editar config.ini e definir:
+      [server]
+      host=192.168.1.1
+      port=8001
+      
+      [agent]
+      machine_name=PC-01  (será sobrescrito no deploy)
+      agent_version=0.1.0
+      heartbeat_seconds=30
+
+═ 2. INSTALAÇÃO EM MÁQUINAS CLIENTES ═══════════════════════════════════════════
+
+Para cada máquina cliente (PC-01, PC-02, ..., PC-14):
+
+2.1 Em cada máquina cliente, abra PowerShell como ADMINISTRADOR
+
+2.2 Execute os comandos:
+
+    # Criar pasta de instalação
+    mkdir "C:\LanManager\agent" -Force
+    
+    # Copiar executável
+    Copy-Item "\\192.168.1.1\LanManager\dist\LanManagerAgent.exe" `
+              "C:\LanManager\agent\LanManagerAgent.exe"
+    
+    # Copiar config
+    Copy-Item "\\192.168.1.1\LanManager\dist\config.ini" `
+              "C:\LanManager\agent\config.ini"
+    
+    # Criar pasta de logs
+    mkdir "C:\LanManager\agent\logs" -Force
+
+2.3 Editar config.ini em cada máquina (ajustar machine_name):
+    
+    notepad "C:\LanManager\agent\config.ini"
+    
+    Mudar [agent] machine_name=PC-01 (para PC-02, PC-03, etc na respectiva máquina)
+
+═ 3. CONFIGURAÇÃO DO SERVIÇO WINDOWS ═══════════════════════════════════════════
+
+3.1 Instalar NSSM (Non-Sucking Service Manager) como administrador:
+    
+    # Se ainda não tiver, baixar e extrair NSSM
+    # https://nssm.cc/download
+    # Versão recomendada: nssm-2.24-101-g897c7ad
+    
+    # Copiar nssm.exe para System32
+    Copy-Item "C:\Users\Admin\Downloads\nssm.exe" "C:\Windows\System32\"
+
+3.2 Registrar serviço no Windows (em cada máquina cliente):
+    
+    nssm install LanManagerAgent "C:\LanManager\agent\LanManagerAgent.exe"
+    nssm set LanManagerAgent AppDirectory "C:\LanManager\agent"
+    nssm set LanManagerAgent AppStdout "C:\LanManager\agent\logs\stdout.log"
+    nssm set LanManagerAgent AppStderr "C:\LanManager\agent\logs\stderr.log"
+    nssm set LanManagerAgent AppRotate 1
+    nssm set LanManagerAgent AppRotateOnline 1
+    nssm start LanManagerAgent
+
+3.3 Verificar status:
+    
+    nssm status LanManagerAgent
+    # Output esperado: SERVICE_RUNNING
+
+═ 4. VERIFICAÇÃO ════════════════════════════════════════════════════════════════
+
+4.1 Verificar serviço no Windows (em cada máquina):
+    
+    # Abrir Services
+    services.msc
+    
+    # Procurar por "LanManagerAgent"
+    # Status deve estar "Running"
+    # Startup Type deve estar "Automatic"
+
+4.2 Verificar logs:
+    
+    Get-Content "C:\LanManager\agent\logs\stdout.log" -Tail 10
+    Get-Content "C:\LanManager\agent\logs\stderr.log" -Tail 10
+
+4.3 Verificar no painel Admin:
+    
+    1. Abrir http://localhost:5173 (dashboard admin)
+    2. Ir para "Dashboard"
+    3. Máquina deve aparecer online em até 30 segundos
+
+═ 5. ATUALIZAÇÃO REMOTA ═════════════════════════════════════════════════════════
+
+Para atualizar o agente em todas as máquinas:
+
+5.1 Na máquina Admin:
+    
+    # Fazer novo build
+    cd C:\Users\Admin\Downloads\LKLAN\client-agent
+    python build_release.py --version 0.2.0
+    
+    # Copiar novo executável para pasta compartilhada
+    Copy-Item "dist\LanManagerAgent.exe" "C:\LanManager\dist\"
+
+5.2 Em cada máquina cliente (ou pelo painel Admin quando ficar pronto):
+    
+    nssm stop LanManagerAgent
+    Copy-Item "\\192.168.1.1\LanManager\dist\LanManagerAgent.exe" `
+              "C:\LanManager\agent\LanManagerAgent.exe" -Force
+    nssm start LanManagerAgent
+
+═ 6. TROUBLESHOOTING ════════════════════════════════════════════════════════════
+
+6.1 Serviço não inicia
+    
+    - Verificar logs: Get-Content "C:\LanManager\agent\logs\stderr.log"
+    - Verificar IP do servidor no config.ini
+    - Verificar firewall (porta 8001 aberta)
+    - Verificar se backend FastAPI está rodando
+
+6.2 Máquina não aparece online no painel
+    
+    - Verificar se agente está rodando: nssm status LanManagerAgent
+    - Verificar ping para servidor: ping 192.168.1.1
+    - Verificar logs de conexão: curl http://192.168.1.1:8001/health
+    
+6.3 Windows Defender bloqueia executável
+    
+    # Adicionar exclusão (como administrador)
+    Add-MpPreference -ExclusionPath "C:\LanManager\"
+    Get-MpPreference -DisableRealtimeMonitoring
+
+6.4 Regras de firewall
+    
+    # Liberar porta 8001 outbound
+    netsh advfirewall firewall add rule name="LanManager Agent Out" ^
+      dir=out action=allow protocol=TCP remotehost=192.168.1.1 remoteport=8001
+    
+    # Liberar porta 5900 outbound (para VNC)
+    netsh advfirewall firewall add rule name="LanManager VNC Out" ^
+      dir=out action=allow protocol=TCP remotehost=192.168.1.1 remoteport=5900
+
+═ 7. ROLLBACK ═══════════════════════════════════════════════════════════════════
+
+Se precisar reverter para versão anterior:
+
+    nssm stop LanManagerAgent
+    Copy-Item "C:\LanManager\agent\LanManagerAgent_backup.exe" `
+              "C:\LanManager\agent\LanManagerAgent.exe" -Force
+    nssm start LanManagerAgent
+
+─────────────────────────────────────────────────────────────────────────────
+✓ DEPLOY CONCLUÍDO

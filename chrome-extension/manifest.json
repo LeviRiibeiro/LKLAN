@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "LAN Manager Escolar Filter",
+  "version": "0.1.0",
+  "description": "Filtro de conteudo para laboratorio escolar",
+  "permissions": ["storage", "webRequest"],
+  "host_permissions": ["<all_urls>", "http://192.168.1.1:8000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html", "blocked.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

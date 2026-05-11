@@ -1,0 +1,15 @@
+LAN Manager Escolar - Agent Standalone Executable
+===================================================
+
+Versão: 0.1.0
+Data do build: 2026-05-11
+Arquivo executável: LanManagerAgent.exe
+
+Specs:
+- Executável standalone (sem dependência de Python)
+- Compilado com PyInstaller 6.20.0
+- Python 3.13.5
+- Inclui todas as bibliotecas necessárias (requests, websockets, PyQt5, psutil, etc)
+- Tamanho: ~120 MB (aproximado)
+
+Status: ✅ PRONTO PARA DEPLOYMENT

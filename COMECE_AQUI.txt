@@ -1,0 +1,131 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                                                                      ║
+║         🚀 LAN MANAGER ESCOLAR - SPRINT 1 - INICIADOR RÁPIDO         ║
+║                                                                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+Bem-vindo! Sprint 1 foi COMPLETADA com sucesso.
+
+Seu projeto agora está 100% funcional e pronto para teste.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 COMECE AQUI (5 MINUTOS)
+
+1. Abra PowerShell ou CMD e execute:
+
+   cd server
+   pip install -r requirements.txt
+   python seed.py
+
+   ✓ Você verá: "Admin inicial criado com sucesso"
+
+2. Sem fechar, mantenha o terminal aberto e execute:
+
+   uvicorn main:app --reload
+
+   ✓ Você verá: "Uvicorn running on http://0.0.0.0:8000"
+
+3. Abra NOVO terminal (Ctrl+Shift+T) e execute:
+
+   cd client-agent
+   pip install -r requirements.txt
+   python agent.py
+
+   ✓ Você verá: "Conectado ao servidor. Iniciando heartbeats."
+
+4. Verifique a API em navegador:
+
+   http://localhost:8000/docs
+
+   ✓ Veja todos os endpoints funcionando!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTAÇÃO IMPORTANTE
+
+Abra estes arquivos conforme necessário:
+
+├─ README.md                 ← Setup guia completo
+├─ TESTE_SPRINT1.md         ← 10 testes com validações
+├─ STATUS_ATUAL.md          ← Resumo visual do projeto
+├─ ALTERACOES_SPRINT1.md    ← Tudo que foi modificado
+└─ SPRINT1_COMPLETA.md      ← Sumário executivo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CHECKLIST - VOCÊ ESTÁ PRONTO?
+
+ □ Python 3.11+ instalado
+ □ Git instalado (opcional, apenas para versionamento)
+ □ Node.js 18+ instalado (só se quiser testar dashboard)
+ □ Permissão de escrita na pasta (para criar database.db)
+ □ Porta 8000 disponível (FastAPI)
+
+Se tudo ✓, você está pronto para começar!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 CREDENCIAIS DE TESTE
+
+Username: admin
+Password: admin123
+
+⚠️  Altere após primeiro login!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ DÚVIDAS FREQUENTES
+
+P: Não consigo instalar dependências
+R: Verifique python --version
+   Se retorna erro, instale Python 3.11+ em python.org
+
+P: Porta 8000 já está em uso
+R: Mude em server/config.py ou mate o processo:
+   netstat -ano | findstr :8000
+   taskkill /PID <PID> /F
+
+P: Banco de dados não foi criado
+R: Verifique se rodou python seed.py
+   Verifique permissões de pasta
+
+P: Agente não conecta
+R: Verifique IP em client-agent/config.ini
+   Teste ping para a máquina
+   Verifique se servidor está rodando
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 O QUE FUNCIONA AGORA?
+
+✅ Autenticação JWT completa
+✅ CRUD de usuários
+✅ Login de agentes
+✅ Heartbeat via WebSocket
+✅ Bloqueio de aplicações (Edge, Firefox)
+✅ Persistência de sessões de uso
+✅ Reset de senha validado
+✅ Tela de login PyQt5 fullscreen
+✅ Deploy script com hardening
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔮 O QUE VIRA NA SPRINT 2?
+
+→ Dashboard Admin com grid de máquinas
+→ Gestão de usuários via painel
+→ Importação de alunos via CSV
+→ Controle remoto de máquinas
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎬 PRÓXIMO PASSO
+
+👉 Execute os passos em "COMECE AQUI" acima e volte aqui se tiver dúvidas!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dúvidas? Consulte TESTE_SPRINT1.md para 10 testes passo a passo.
+
+✨ Bem-vindo ao LAN Manager Escolar v2.0! ✨

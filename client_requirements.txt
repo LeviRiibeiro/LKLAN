@@ -1,0 +1,40 @@
+# ============================================================
+# LAN Manager Escolar — Client Agent Requirements
+# Máquinas Alunos (14x Windows 10) — Python 3.11+
+# Instalar com: pip install -r requirements.txt
+#
+# COMPILAÇÃO PARA .EXE (sem precisar de Python instalado):
+#   pip install pyinstaller
+#   pyinstaller --onefile --windowed --icon=assets/icon.ico \
+#               --name=LanManagerAgent agent.py
+#
+# O .exe gerado em /dist/ pode ser distribuído para as
+# 14 máquinas sem nenhuma dependência extra.
+# ============================================================
+
+# --- Comunicação com Servidor ---
+websockets==12.0                 # WebSocket para heartbeat e comandos
+requests==2.31.0                 # HTTP para autenticação e sync de listas
+
+# --- Interface Gráfica (Tela de Login Fullscreen) ---
+PyQt5==5.15.10                   # UI da tela de login bloqueio
+PyQt5-Qt5==5.15.13
+PyQt5-sip==12.13.0
+
+# --- Monitoramento e Controle de Processos ---
+psutil==5.9.8                    # Monitorar e matar processos (bloqueio de apps)
+
+# --- Captura de Tela (Screenshots) ---
+mss==9.0.1                       # Captura de tela rápida e eficiente
+Pillow==10.3.0                   # Processamento e compressão das imagens
+
+# --- Integração com Windows ---
+pywin32==306                     # Windows API: LockWorkStation, shutdown, etc.
+pywin32-ctypes==0.2.2
+
+# --- Compilação para .exe ---
+pyinstaller==6.6.0               # Compilar agente Python → .exe standalone
+
+# --- Utilitários ---
+python-dotenv==1.0.1             # Variáveis de ambiente (IP do servidor, etc.)
+cryptography==42.0.5             # Criptografia básica para tokens locais
