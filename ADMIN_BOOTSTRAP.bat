@@ -3,6 +3,11 @@ setlocal enableextensions enabledelayedexpansion
 
 set "ROOT=%~dp0"
 cd /d "%ROOT%"
+set "LOG=%ROOT%admin_bootstrap.log"
+echo ========================================== > "%LOG%"
+echo LAN Manager Escolar - Admin Bootstrap >> "%LOG%"
+echo Started at %DATE% %TIME% >> "%LOG%"
+echo. >> "%LOG%"
 
 echo ==========================================
 echo   LAN Manager Escolar - Admin Bootstrap
@@ -72,24 +77,25 @@ python -m pip install --upgrade pip
 if errorlevel 1 goto :fail
 
 echo [2/5] Instalando dependencias do servidor...
+echo [2/5] Instalando dependencias do servidor... >> "%LOG%"
 cd /d "%ROOT%server"
-python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt >> "%LOG%" 2>&1
 if errorlevel 1 goto :fail
 cd /d "%ROOT%"
 
-echo [3/5] Seed do banco...
-python -c "import sys; sys.path.insert(0, '.'); import asyncio; from server.seed import seed_admin; asyncio.run(seed_admin())"
+echo [3/5] Seed do banco... >> "%LOG%"
+python -c "import sys; sys.path.insert(0, '.'); import asyncio; from server.seed import seed_admin; asyncio.run(seed_admin())" >> "%LOG%" 2>&1
 if errorlevel 1 goto :fail
 
-echo [4/5] Instalando dependencias do dashboard...
+echo [4/5] Instalando dependencias do dashboard... >> "%LOG%"
 cd /d "%ROOT%admin-dashboard"
-npm install
+npm install >> "%LOG%" 2>&1
 if errorlevel 1 goto :fail
 cd /d "%ROOT%"
 
-echo [5/5] Build do dashboard...
+echo [5/5] Build do dashboard... >> "%LOG%"
 cd /d "%ROOT%admin-dashboard"
-npm run build
+npm run build >> "%LOG%" 2>&1
 if errorlevel 1 goto :fail
 cd /d "%ROOT%"
 
@@ -125,10 +131,49 @@ npm run dev
 exit /b %errorlevel%
 
 :run
-start "LKLAN Server" cmd /k "cd /d \"%ROOT%\" && call .venv\Scripts\activate.bat && python -m uvicorn server.main:app --host 0.0.0.0 --port 8000"
-start "LKLAN Dashboard" cmd /k "cd /d \"%ROOT%admin-dashboard\" && npm run dev"
+echo.
+echo ==========================================
+echo   Iniciando servidor e dashboard...
+echo ==========================================
+echo.
+
+REM Criar script temporario para servidor (evita problema de sintaxe com parenteses)
+setlocal
+(
+  echo @echo off
+  echo cd /d "%ROOT%"
+  echo call .venv\Scripts\activate.bat
+  echo python -m uvicorn server.main:app --host 0.0.0.0 --port 8000
+) > "%TEMP%\lklan_server.bat"
+
+REM Criar script temporario para dashboard
+(
+  echo @echo off
+  echo cd /d "%ROOT%admin-dashboard"
+  echo npm run dev
+) > "%TEMP%\lklan_dashboard.bat"
+
+REM Iniciar servidor em nova janela
+start "LKLAN Server (FastAPI)" "%TEMP%\lklan_server.bat"
+
+REM Aguardar 2 segundos para server iniciar
+timeout /t 2 /nobreak
+
+REM Iniciar dashboard em nova janela
+start "LKLAN Dashboard (Vite)" "%TEMP%\lklan_dashboard.bat"
+
+echo.
 echo OK: servidor e dashboard foram abertos em janelas separadas.
+echo.
+echo ===== ACESSO =====
+echo Backend:  http://127.0.0.1:8000/docs
+echo Dashboard: http://localhost:5173
+echo ==================
+echo.
+echo Pressione qualquer tecla para encerrar este prompt
+echo (as janelas de servidor e dashboard continuarao abertas)...
 pause
+endlocal
 exit /b 0
 
 :fail
