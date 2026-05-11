@@ -14,8 +14,8 @@ router = APIRouter(prefix="/time", tags=["time"])
 class TimeScheduleUpdate(BaseModel):
     """Modelo para atualizar horários"""
     enabled: Optional[bool] = None
-    start: Optional[str] = Field(None, regex=r"^\d{2}:\d{2}$")
-    end: Optional[str] = Field(None, regex=r"^\d{2}:\d{2}$")
+    start: Optional[str] = Field(None, pattern=r"^\d{2}:\d{2}$")
+    end: Optional[str] = Field(None, pattern=r"^\d{2}:\d{2}$")
     monday: Optional[bool] = None
     tuesday: Optional[bool] = None
     wednesday: Optional[bool] = None

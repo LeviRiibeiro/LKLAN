@@ -5,7 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from server.database import init_db
-from server.routers import agent_update, auth, blocked_apps, blocked_sites, import_users, lab_config, logs, machines, time_management, users, backups
+from server.routers import auth, blocked_apps, blocked_sites, import_users, lab_config, logs, machines, time_management, users, backups
+try:
+    from server.routers import agent_update
+except Exception as e:
+    print(f"Warning: agent_update não pode ser importado: {e}")
+    agent_update = None
 from server.services.websocket_manager import ws_manager
 from server.services.backup_service import BackupService
 
@@ -31,7 +36,8 @@ app.include_router(lab_config.router)
 app.include_router(logs.router)
 app.include_router(backups.router)
 app.include_router(import_users.router)
-app.include_router(agent_update.router)
+if agent_update:
+    app.include_router(agent_update.router)
 
 
 # Global backup service instance
