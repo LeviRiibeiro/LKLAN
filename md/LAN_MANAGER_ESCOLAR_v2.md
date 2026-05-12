@@ -541,11 +541,160 @@ CREATE TABLE agent_versions (
 ### 10.2 Gerenciamento de Usuários
 - Lista de alunos com filtro por turma, status e busca por nome
 - Cadastro individual + importação em massa via CSV/Excel
+- **NOVO:** Cada usuário recebe um **código único aleatório** ao ser criado (ex: `A7K9M2`)
+  - Código aparece na confirmação de cadastro para o professor imprimir/anotar
+  - Código não pode ser alterado ou regenerado (permanente do aluno)
+  - Função: identificar aluno para liberação de tempo sem precisar saber usuário/senha
 - Por aluno: editar dados, ver histórico completo de sessões
 - Painel de punição: zerar saldo, suspender X dias, registrar advertência, tudo com campo de motivo obrigatório
-- Reset de senha do aluno com ação rápida (atende fluxo “esqueci a senha”)
+- Reset de senha do aluno com ação rápida (atende fluxo "esqueci a senha")
 
-### 10.3 Visualização de Telas
+### 10.2.1 **NOVO - Gestão de Tempo por Código de Aluno**
+
+Este é um novo fluxo de **liberação de tempo de forma simplificada e intuitiva** para o professor.
+
+#### Fluxo Completo:
+
+```
+[Professor clica em "Gestão de Tempo" no painel Admin]
+        │
+        ▼
+[Tela mostra: campo de entrada + botões de ação]
+        │
+        ├── Campo: "Digite o código do aluno" (ex: A7K9M2)
+        │
+        ▼
+[Professor digita o código]
+        │
+        ▼
+[Clica em "Buscar Aluno"]
+        │
+        ├── [Código inválido/não existe] → Mensagem de erro "Código não encontrado"
+        │
+        └── [Código válido]
+                │
+                ▼
+        [Sistema encontra o usuário no banco e exibe:]
+        ├── Nome completo do aluno
+        ├── Usuário (login)
+        ├── Turma
+        ├── ⏱️ Saldo de tempo ATUAL (em minutos)
+        ├── Data de criação
+        └── Status (ativo/suspenso)
+                │
+                ▼
+        [Aparecem 3 opções de ação:]
+        │
+        ├── [Botão] "Liberar Minutos"
+        │    └─→ Abre campo numérico: "Quantos minutos?"
+        │        └─→ Exemplo: digita "30" → adiciona 30 min ao saldo
+        │        └─→ Ao confirmar: mensagem "✓ Liberado 30 min para João Silva"
+        │        └─→ Histórico é registrado: "Admin liberou 30 min — 12/05/2026 14:35"
+        │
+        ├── [Botão] "Liberar Ilimitado"
+        │    └─→ Abre modal de confirmação com aviso:
+        │        "⚠️ Tem certeza? Aluno terá tempo INFINITO até resetar manualmente"
+        │        └─→ Se confirmar: saldo fica com valor especial "∞" (ILIMITADO)
+        │        └─→ Mensagem: "✓ Acesso ilimitado concedido para João Silva"
+        │        └─→ Campo observação (opcional): "Motivo: Trabalho especial de Informática"
+        │
+        └── [Botão] "⚠️ Advertência - Zerar Tempo"
+             └─→ Abre modal com campo de motivo (OBRIGATÓRIO):
+                 "Motivo da punição:" [______________________]
+                 └─→ Exemplos de motivo:
+                     - "Acesso a site inadequado"
+                     - "Jogo durante aula"
+                     - "Comportamento inadequado"
+                 └─→ Se confirmar: saldo fica em 0
+                 └─→ Mensagem: "✓ Tempo zerado para João Silva — Motivo registrado"
+                 └─→ No histórico do aluno fica marcado como punição
+                 └─→ Aluno ao entrar vê: "Sua sessão foi encerrada. Procure o professor."
+```
+
+#### **Caracteres do Código Único:**
+- **Formato:** 6 caracteres alfanuméricos (maiúsculas + números)
+  - Exemplo: `A7K9M2`, `B2P5X8`, `Z1L3Q7`
+- **Geração:** Aleatória ao criar o usuário, não duplicada
+- **Visibilidade:** 
+  - Mostrado na página de confirmação após criar usuário
+  - Professor pode imprimir lista com nomes + códigos no início do ano
+  - Aparece também na seção "Usuários" → campo visível para o admin consultar
+- **Segurança:** Código é apenas para referência rápida, não substitui autenticação
+
+#### **Reinicialização Automática de Tempo:**
+- ⏰ **Todos os dias às 00:00** (meia-noite):
+  - Sistema executa scheduler que **reseta tempo de TODOS os alunos** para **15 minutos**
+  - Exceção: se aluno está com acesso **ILIMITADO**, permanece ilimitado
+  - Log registra: "Reset diário de tempo — 12/05/2026 00:00"
+- 🎯 **Intuição:** Cada dia letivo começa com 15 min "base", professor adiciona conforme necessário
+
+#### **Histórico de Transações de Tempo:**
+Cada ação de "liberar tempo" é registrada em um log específico:
+```
+Histórico de Tempo do Aluno — João Silva (A7K9M2)
+┌─────────────────────────────────────────────────────────────┐
+│ Data/Hora      │ Admin      │ Ação           │ Minutos │ Motivo
+├─────────────────────────────────────────────────────────────┤
+│ 12/05 14:35    │ Professora │ Liberar        │ +30     │ Trabalho especial
+│ 12/05 10:15    │ Admin      │ Reset Diário   │ 15      │ Reinicialização
+│ 11/05 09:42    │ Professora │ Advertência    │ 0       │ Comportamento inadequado
+│ 11/05 08:00    │ Admin      │ Reset Diário   │ 15      │ Reinicialização
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### **Banco de Dados — Mudanças Necessárias:**
+Adicionar campos à tabela `users`:
+```sql
+ALTER TABLE users ADD COLUMN user_code VARCHAR(6) UNIQUE NOT NULL;  -- 'A7K9M2'
+ALTER TABLE users ADD COLUMN time_unlimited BOOLEAN DEFAULT FALSE;   -- flag para ILIMITADO
+
+-- Nova tabela para histórico de transações de tempo
+CREATE TABLE time_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    admin_id INTEGER NOT NULL,
+    action TEXT,               -- 'add', 'reset', 'punish', 'unlimited'
+    minutes_added INTEGER,     -- pode ser NULL se ilimitado
+    reason TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (admin_id) REFERENCES users(id)
+);
+```
+
+#### **Endpoint Backend Necessário:**
+```python
+POST /time-management/by-code
+{
+  "user_code": "A7K9M2",
+  "action": "add" | "unlimited" | "punish",
+  "minutes": 30,                -- se action = "add"
+  "reason": "Trabalho especial"  -- se action = "punish"
+}
+
+Response:
+{
+  "success": true,
+  "user": {
+    "id": 5,
+    "name": "João Silva",
+    "username": "joao.silva",
+    "user_code": "A7K9M2",
+    "time_balance": 30,
+    "time_unlimited": false
+  },
+  "transaction": {
+    "action": "add",
+    "minutes": 30,
+    "new_balance": 30,
+    "timestamp": "2026-05-12T14:35:00"
+  }
+}
+```
+
+---
+
+
 - Preview de screenshot de cada máquina (atualiza a cada 10s)
 - Clique no preview → abre TigerVNC Viewer (controle total)
 - Modo grade: miniaturas de todas as 14 telas simultâneas
