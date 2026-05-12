@@ -17,7 +17,7 @@ function AgentUpdate() {
   const fetchVersions = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://127.0.0.1:8001/agent-update/list");
+      const response = await axios.get("http://127.0.0.1:8000/agent-update/list");
       setVersions(response.data.versions || []);
       
       if (response.data.versions && response.data.versions.length > 0) {
@@ -59,7 +59,7 @@ function AgentUpdate() {
       formData.append("file", selectedFile);
 
       const response = await axios.post(
-        "http://127.0.0.1:8001/agent-update/upload",
+        "http://127.0.0.1:8000/agent-update/upload",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -81,7 +81,7 @@ function AgentUpdate() {
   };
 
   const handleDownload = (filename) => {
-    window.open(`http://127.0.0.1:8001/agent-update/download/${filename}`, "_blank");
+    window.open(`http://127.0.0.1:8000/agent-update/download/${filename}`, "_blank");
   };
 
   useEffect(() => {
